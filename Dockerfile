@@ -15,7 +15,29 @@ RUN cp -a /tmp/node_modules /opt/app/dynamo-archive
 
 VOLUME /dynamodata
 
+#install pip
+RUN cd /tmp && curl -L -O https://bootstrap.pypa.io/get-pip.py && python get-pip.py
+
+#use pip to install aws-cli (http://aws.amazon.com/cli/)
+RUN pip install awscli
+
+#install crontab
+RUN yum install -y cronie
+RUN service crond start
+RUN echo '* * * * * root /opt/app/dynamo-archive/backup.sh' >> /etc/crontab
+
+#Make it a template image (for customized execution scripts?)
+# ENV RUN_SCRIPT=script.sh
+# ADD $RUN_SCRIPT /opt/app/dynamo-archive/backup.sh
+# RUN chmod +x /opt/app/dynamo-archive/backup.sh
+
+ONBUILD ADD scripts/backup.sh /opt/app/dynamo-archive/backup.sh
+ONBUILD RUN chmod +x /opt/app/dynamo-archive/backup.sh
+
+ADD scripts/start_job.sh /opt/app/dynamo-archive/start_job.sh
+RUN chmod +x /opt/app/dynamo-archive/start_job.sh
+
 WORKDIR /opt/app/dynamo-archive
 ADD . /opt/app/dynamo-archive
 
-CMD ["bash"]
+CMD ["./bin/start_job.sh"]
