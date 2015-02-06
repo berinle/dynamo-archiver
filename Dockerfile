@@ -7,10 +7,8 @@ RUN yum install -y npm git
 # clone dynamo archiver project
 RUN mkdir -p /opt/app && cd /opt/app && git clone https://github.com/yegor256/dynamo-archive.git
 
-#ADD package.json /tmp/package.json
 ADD https://raw.githubusercontent.com/yegor256/dynamo-archive/master/package.json /tmp/package.json
 RUN cd /tmp && npm install
-#RUN cp -a /tmp/node_modules /opt/app
 RUN cp -a /tmp/node_modules /opt/app/dynamo-archive
 
 VOLUME /dynamodata
@@ -26,11 +24,6 @@ RUN yum install -y cronie
 RUN service crond start
 RUN echo '* * * * * root /opt/app/dynamo-archive/backup.sh' >> /etc/crontab
 
-#Make it a template image (for customized execution scripts?)
-# ENV RUN_SCRIPT=script.sh
-# ADD $RUN_SCRIPT /opt/app/dynamo-archive/backup.sh
-# RUN chmod +x /opt/app/dynamo-archive/backup.sh
-
 ONBUILD ADD scripts/backup.sh /opt/app/dynamo-archive/backup.sh
 ONBUILD RUN chmod +x /opt/app/dynamo-archive/backup.sh
 
@@ -40,4 +33,4 @@ RUN chmod +x /opt/app/dynamo-archive/start_job.sh
 WORKDIR /opt/app/dynamo-archive
 ADD . /opt/app/dynamo-archive
 
-CMD ["./bin/start_job.sh"]
+CMD ["./start_job.sh"]
