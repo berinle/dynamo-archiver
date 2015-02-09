@@ -26,6 +26,7 @@ RUN echo '* * * * * root /opt/app/dynamo-archive/backup.sh' >> /etc/crontab
 
 ONBUILD ADD scripts/backup.sh /opt/app/dynamo-archive/backup.sh
 ONBUILD RUN chmod +x /opt/app/dynamo-archive/backup.sh
+ONBUILD ADD misc /opt/app/misc
 
 ADD scripts/start_job.sh /opt/app/dynamo-archive/start_job.sh
 RUN chmod +x /opt/app/dynamo-archive/start_job.sh
